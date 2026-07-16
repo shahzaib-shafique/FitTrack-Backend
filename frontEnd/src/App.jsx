@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import { AppLayout } from "./layouts/AppLayout.jsx";
+
+// Import your structural layouts from the layouts folder
+import ProtectedRoute from "./layouts/ProtectedRoute.jsx";
+import GuestRoute from "./layouts/GuestRoute.jsx";
 
 // Pages
 import Login from "./pages/Login.jsx";
@@ -19,33 +23,6 @@ import Profile from "./pages/Profile.jsx";
 import Settings from "./pages/Settings.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center animate-pulse">
-            <span className="text-2xl">⚡</span>
-          </div>
-          <div className="w-6 h-6 border-2 border-slate-700 border-t-emerald-500 rounded-full animate-spin" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-}
-
-function GuestRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (user) return <Navigate to="/dashboard" replace />;
-  return children;
-}
-
 function AppRoutes() {
   return (
     <Routes>
@@ -55,7 +32,7 @@ function AppRoutes() {
 
       {/* Protected routes */}
       <Route
-        element={
+        element = {
           <ProtectedRoute>
             <AppLayout />
           </ProtectedRoute>

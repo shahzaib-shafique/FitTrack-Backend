@@ -28,6 +28,13 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  // NEW: Update Global Context with Google Profile Details
+  const loginWithGoogle = async (idToken) => {
+    const data = await authService.loginWithGoogle(idToken);
+    setUser(data.user);
+    return data;
+  };
+
   const register = async (credentials) => {
     const data = await authService.register(credentials);
     setUser(data.user);
@@ -44,7 +51,18 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, refetch: fetchMe }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading, 
+        login, 
+        loginWithGoogle, // <-- EXPOSED TO CONSUMERS
+        register, 
+        logout, 
+        updateUser, 
+        refetch: fetchMe 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
