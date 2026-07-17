@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +22,7 @@ const schema = z.object({
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -29,6 +30,36 @@ export default function Register() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) return;
+
+    /* global google */
+    if (typeof google !== "undefined") {
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          const loginToast = toast.loading("Creating your secure account...");
+          try {
+            await loginWithGoogle(response.credential);
+            toast.success("Account registered successfully!", { id: loginToast });
+            navigate("/dashboard");
+          } catch (err) {
+            toast.error(err.message || "Registration failed.", { id: loginToast });
+          }
+        },
+      });
+
+      const container = document.getElementById("hiddenGoogleBtnContainerReg");
+      if (container) {
+        google.accounts.id.renderButton(container, {
+          type: "standard",
+          theme: "dark",
+        });
+      }
+    }
+  }, [loginWithGoogle, navigate]);
 
   const onSubmit = async (data) => {
     try {
@@ -40,9 +71,22 @@ export default function Register() {
     }
   };
 
+  const handleCustomGoogleLogin = () => {
+    const nativeBtn = document.querySelector("#hiddenGoogleBtnContainerReg div[role=button]");
+    if (nativeBtn) {
+      nativeBtn.click();
+    } else if (typeof google !== "undefined") {
+      google.accounts.id.prompt();
+    } else {
+      toast.error("Google services are loading. Please try again.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-black flex">
-      {/* Left panel — decorative */}
+    <div className="min-h-screen bg-black flex text-white antialiased">
+      <div id="hiddenGoogleBtnContainerReg" className="hidden" />
+
+      {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-black items-center justify-center p-12">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-cyan-500/5 to-blue-500/5" />
         <div className="absolute top-1/4 -left-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl" />
@@ -67,59 +111,43 @@ export default function Register() {
         </motion.div>
       </div>
 
-      {/* Right panel — form */}
+      {/* Right panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md flex flex-col items-stretch"
         >
-          {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-3 mb-8">
+          <div className="flex lg:hidden items-center gap-3 mb-8 self-start">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
               <Zap size={20} className="text-white" />
             </div>
             <span className="text-xl font-bold text-white">FitTrack</span>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-1">Create account</h2>
-          <p className="text-slate-400 mb-8">Start your transformation today.</p>
+          <h2 className="text-3xl font-bold text-white mb-1 self-start">Create account</h2>
+          <p className="text-slate-400 mb-8 self-start">Start your transformation today.</p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Name */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
             <div>
               <label className="label">Full name</label>
               <div className="relative">
                 <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                <input
-                  {...register("name")}
-                  type="text"
-                  autoComplete="name"
-                  placeholder="John Doe"
-                  className="input-field pl-10"
-                />
+                <input {...register("name")} type="text" placeholder="John Doe" className="input-field pl-10" />
               </div>
               {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name.message}</p>}
             </div>
 
-            {/* Email */}
             <div>
               <label className="label">Email address</label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                <input
-                  {...register("email")}
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  className="input-field pl-10"
-                />
+                <input {...register("email")} type="email" placeholder="you@example.com" className="input-field pl-10" />
               </div>
               {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email.message}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <label className="label">Password</label>
               <div className="relative">
@@ -127,7 +155,6 @@ export default function Register() {
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
                   placeholder="••••••••"
                   className="input-field pl-10 pr-10"
                 />
@@ -140,9 +167,6 @@ export default function Register() {
                 </button>
               </div>
               {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password.message}</p>}
-              {!errors.password && (
-                <p className="text-slate-500 text-xs mt-1.5">Must be 8+ chars with uppercase, lowercase, and number</p>
-              )}
             </div>
 
             <motion.button
@@ -162,6 +186,29 @@ export default function Register() {
             </motion.button>
           </form>
 
+          <div className="relative flex py-4 sm:py-5 items-center w-full">
+            <div className="flex-grow border-t border-slate-800"></div>
+            <span className="flex-shrink mx-4 text-slate-500 text-[10px] sm:text-xs uppercase tracking-widest">
+              Or continue with
+            </span>
+            <div className="flex-grow border-t border-slate-800"></div>
+          </div>
+
+          {/* Premium Dark Silver / Slate Button */}
+          <button
+            type="button"
+            onClick={handleCustomGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-slate-900 to-zinc-900 hover:from-slate-800 hover:to-zinc-800 border border-slate-800/80 hover:border-slate-700/80 text-zinc-200 font-medium rounded-xl py-3 px-4 text-sm transition-all duration-200 shadow-xl shadow-black/40 cursor-pointer"
+          >
+            <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582l3.51-3.51C17.642 1.054 14.98 0 12 0 7.354 0 3.307 2.667 1.297 6.56l3.969 3.205z" />
+              <path fill="#34A853" d="M16.04 15.345c-1.077.732-2.483 1.164-4.04 1.164-2.927 0-5.414-1.982-6.299-4.654L1.711 15.04C3.766 19.045 7.9 21.818 12 21.818c3.273 0 6.04-.1 8.218-3.054l-4.178-3.419z" />
+              <path fill="#4285F4" d="M23.49 12.273c0-.818-.082-1.609-.218-2.373H12v4.582h6.49c-.29 1.51-.127 2.791-2.45 3.282l4.178 3.419c2.44-2.255 3.272-5.573 3.272-8.91z" />
+              <path fill="#FBBC05" d="M5.701 11.855a7.126 7.126 0 0 1 0-2.31L1.71 6.364a11.96 11.96 0 0 0 0 11.237l3.991-3.746z" />
+            </svg>
+            Continue with Google
+          </button>
+
           <p className="text-center text-slate-500 text-sm mt-6">
             Already have an account?{" "}
             <Link to="/login" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
@@ -173,3 +220,4 @@ export default function Register() {
     </div>
   );
 }
+
