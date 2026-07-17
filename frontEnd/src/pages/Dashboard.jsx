@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useWorkoutStats, useWorkouts } from "../hooks/useWorkouts.js";
 import { StatCardSkeleton, WorkoutCardSkeleton } from "../components/ui/LoadingSkeleton.jsx";
 import { WeeklyCaloriesChart } from "../components/charts/WeeklyCaloriesChart.jsx";
-import { CategoryPieChart } from "../components/charts/CategoryPieChart.jsx";
 import { formatDuration, formatRelativeDate, CATEGORY_ICONS, DIFFICULTY_COLOR } from "../utils/helpers.js";
 
 const container = {
@@ -156,17 +155,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="glass-card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-white">Categories</h3>
-            <Target size={16} className="text-cyan-400" />
-          </div>
-          {statsLoading ? (
-            <div className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
-          ) : (
-            <CategoryPieChart data={stats?.categoryBreakdown || []} />
-          )}
-        </div>
+        
       </motion.div>
 
       {/* Recent workouts */}
@@ -206,25 +195,6 @@ export default function Dashboard() {
             ))
           )}
         </div>
-      </motion.div>
-
-      {/* Quick actions */}
-      <motion.div variants={item} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { to: "/workouts/new", icon: "💪", label: "Log Workout", color: "from-emerald-500/10 to-cyan-500/10 border-emerald-500/20" },
-          { to: "/water", icon: "💧", label: "Log Water", color: "from-blue-500/10 to-cyan-500/10 border-blue-500/20" },
-          { to: "/bmi", icon: "📊", label: "Check BMI", color: "from-violet-500/10 to-purple-500/10 border-violet-500/20" },
-          { to: "/calendar", icon: "📅", label: "Calendar", color: "from-amber-500/10 to-orange-500/10 border-amber-500/20" },
-        ].map((action) => (
-          <Link
-            key={action.to}
-            to={action.to}
-            className={`glass-card p-4 flex flex-col items-center gap-2 hover:scale-105 transition-all duration-200 border bg-gradient-to-br ${action.color}`}
-          >
-            <span className="text-2xl">{action.icon}</span>
-            <span className="text-xs font-medium text-slate-300">{action.label}</span>
-          </Link>
-        ))}
       </motion.div>
     </motion.div>
   );

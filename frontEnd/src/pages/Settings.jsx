@@ -119,7 +119,6 @@ export default function Settings() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Settings</h1>
         <p className="text-slate-500 text-sm">Manage your account and preferences</p>
       </div>
 
@@ -317,9 +316,6 @@ export default function Settings() {
         <div>
           <p className="text-sm font-medium text-slate-300">FitTrack</p>
           <p className="text-xs text-slate-500">Version 2.0.0 · Production Build</p>
-        </div>
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-sm">
-          ⚡
         </div>
       </motion.div>
 

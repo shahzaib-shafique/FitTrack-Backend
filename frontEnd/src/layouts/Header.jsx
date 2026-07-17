@@ -5,7 +5,7 @@ import { getInitials } from "../utils/helpers.js";
 
 const PAGE_META = {
   "/dashboard":  { title: "Dashboard",        subtitle: "Welcome back" },
-  "/workouts":   { title: "Workouts",          subtitle: "Track your training",   cta: { label: "Log Workout", to: "/workouts/new" } },
+  "/workouts":   { title: "Workouts",          subtitle: "Track your training", },
   "/workouts/new": { title: "Log Workout",     subtitle: "Record a session" },
   "/progress":   { title: "Progress",          subtitle: "Your fitness journey" },
   "/calendar":   { title: "Calendar",          subtitle: "Plan your week" },

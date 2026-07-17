@@ -1,7 +1,25 @@
 import Workout from "../models/Workout.js";
+import User from "../models/User.js"; // IMPORTED: Need User model to update recents
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
 import { validate, workoutCreateSchema, workoutUpdateSchema } from "../utils/validation.js";
+
+// Helper utility to maintain unique recent exercise lists up to 5 items
+const updateRecentExercises = async (userId, exerciseName) => {
+  if (!exerciseName) return;
+  const user = await User.findById(userId);
+  if (!user) return;
+
+  // Filter out the exercise if it already exists, then unshift to front
+  let updatedRecents = [
+    exerciseName, 
+    ...user.recentExercises.filter((ex) => ex.toLowerCase() !== exerciseName.toLowerCase())
+  ];
+  
+  // Keep the 5 most recent records
+  user.recentExercises = updatedRecents.slice(0, 5);
+  await user.save();
+};
 
 // GET /api/workouts
 export const getWorkouts = asyncHandler(async (req, res) => {
@@ -43,12 +61,10 @@ export const getWorkouts = asyncHandler(async (req, res) => {
 export const getWorkoutStats = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  // Last 7 days
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const sevenDaysStr = sevenDaysAgo.toISOString().split("T")[0];
 
-  // Last 30 days
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const thirtyDaysStr = thirtyDaysAgo.toISOString().split("T")[0];
@@ -96,7 +112,6 @@ export const getWorkoutStats = asyncHandler(async (req, res) => {
     ]),
   ]);
 
-  // Build streak
   const allWorkoutDates = await Workout.find({ user_id: userId })
     .select("date")
     .sort("-date")
@@ -153,6 +168,9 @@ export const createWorkout = asyncHandler(async (req, res) => {
 
   const workout = await Workout.create({ ...data, user_id: req.user._id });
 
+  // CHANGED: Automatically append to the user's recent exercise historical list
+  await updateRecentExercises(req.user._id, data.exercise);
+
   res.status(201).json({ success: true, workout });
 });
 
@@ -172,6 +190,9 @@ export const updateWorkout = asyncHandler(async (req, res) => {
   if (!workout) {
     throw new AppError("Workout not found.", 404);
   }
+
+  // CHANGED: Update list if exercise identity string gets re-assigned during modifications
+  await updateRecentExercises(req.user._id, data.exercise);
 
   res.status(200).json({ success: true, workout });
 });

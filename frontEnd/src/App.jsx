@@ -16,8 +16,6 @@ import Workouts from "./pages/Workouts.jsx";
 import WorkoutForm from "./pages/WorkoutForm.jsx";
 import WorkoutDetail from "./pages/WorkoutDetail.jsx";
 import Progress from "./pages/Progress.jsx";
-import Calendar from "./pages/Calendar.jsx";
-import WaterTracker from "./pages/WaterTracker.jsx";
 import BMICalculator from "./pages/BMICalculator.jsx";
 import Profile from "./pages/Profile.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -45,8 +43,6 @@ function AppRoutes() {
         <Route path="/workouts/:id" element={<WorkoutDetail />} />
         <Route path="/workouts/:id/edit" element={<WorkoutForm />} />
         <Route path="/progress" element={<Progress />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/water" element={<WaterTracker />} />
         <Route path="/bmi" element={<BMICalculator />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />

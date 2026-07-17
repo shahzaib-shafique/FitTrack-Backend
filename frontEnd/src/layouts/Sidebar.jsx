@@ -6,9 +6,7 @@ import {
   User,
   Settings,
   LogOut,
-  Droplets,
   Calculator,
-  Calendar,
   Zap,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -19,8 +17,6 @@ const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/workouts", icon: Dumbbell, label: "Workouts" },
   { to: "/progress", icon: BarChart3, label: "Progress" },
-  { to: "/calendar", icon: Calendar, label: "Calendar" },
-  { to: "/water", icon: Droplets, label: "Hydration" },
   { to: "/bmi", icon: Calculator, label: "BMI" },
 ];
 

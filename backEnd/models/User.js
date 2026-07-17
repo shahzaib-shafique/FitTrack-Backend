@@ -17,16 +17,15 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      // CHANGED: Password is no longer strictly required for Google users
       required: function() {
-        return !this.googleId; // Only required if they aren't using Google Auth
+        return !this.googleId;
       },
       minlength: 8,
     },
     googleId: {
       type: String,
       unique: true,
-      sparse: true, // Allows multiple traditional users to have no googleId
+      sparse: true,
     },
     avatar: {
       type: String,
@@ -67,13 +66,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // ADDED: Track recent exercises directly inside the User document
+    recentExercises: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );
 
 // Hashing hook
 userSchema.pre("save", async function (next) {
-  // CHANGED: Added verification to check if a password exists before hashing
   if (!this.password || !this.isModified("password")) return next();
   
   const salt = await bcrypt.genSalt(12);
@@ -82,7 +85,6 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  // Safely handle cases where a Google user tries to sign in traditionally without a password
   if (!this.password) return false; 
   return bcrypt.compare(candidatePassword, this.password);
 };

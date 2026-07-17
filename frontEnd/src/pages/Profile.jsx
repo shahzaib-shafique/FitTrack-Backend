@@ -16,8 +16,8 @@ const schema = z.object({
   weight: z.coerce.number().min(20).max(500).optional().or(z.literal("")),
   height: z.coerce.number().min(50).max(300).optional().or(z.literal("")),
   fitnessGoal: z.enum(["lose_weight", "build_muscle", "improve_endurance", "stay_active", "other"]),
-  weeklyGoal: z.coerce.number().int().min(1).max(7),
-  dailyWaterGoal: z.coerce.number().int().min(1).max(30),
+  weeklyGoal: z.coerce.number().int().min(1).max(7).optional().or(z.literal("")),
+  dailyWaterGoal: z.coerce.number().min(0.5).max(10).optional().or(z.literal("")),
 });
 
 export default function Profile() {
@@ -32,8 +32,8 @@ export default function Profile() {
       weight: "",
       height: "",
       fitnessGoal: "stay_active",
-      weeklyGoal: 4,
-      dailyWaterGoal: 8,
+      weeklyGoal: "",
+      dailyWaterGoal: "",
     },
   });
 
@@ -41,12 +41,12 @@ export default function Profile() {
     if (user) {
       reset({
         name: user.name || "",
-        bio: user.bio || "",
-        weight: user.weight || "",
-        height: user.height || "",
+        bio: "", // Empty to show native placeholder style on load
+        weight: "", // Empty to show native placeholder style on load
+        height: "", // Empty to show native placeholder style on load
         fitnessGoal: user.fitnessGoal || "stay_active",
-        weeklyGoal: user.weeklyGoal || 4,
-        dailyWaterGoal: user.dailyWaterGoal || 8,
+        weeklyGoal: "", // Empty to show native placeholder style on load
+        dailyWaterGoal: "", // Empty to show native placeholder style on load
       });
     }
   }, [user, reset]);
@@ -56,12 +56,24 @@ export default function Profile() {
       ...data,
       weight: data.weight === "" ? null : Number(data.weight),
       height: data.height === "" ? null : Number(data.height),
+      weeklyGoal: data.weeklyGoal === "" ? null : Number(data.weeklyGoal),
+      dailyWaterGoal: data.dailyWaterGoal === "" ? null : Number(data.dailyWaterGoal),
       bio: data.bio === "" ? null : data.bio,
     };
     try {
       const res = await userService.updateProfile(payload);
       updateUser(res.user);
       toast.success("Profile updated!");
+      
+      // Clear specific input values back to empty strings right after saving to bring back the placeholders
+      reset({
+        ...data,
+        bio: "",
+        weight: "",
+        height: "",
+        weeklyGoal: "",
+        dailyWaterGoal: "",
+      });
     } catch (err) {
       toast.error(err.message);
     }
@@ -74,7 +86,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-2xl mx-auto px-2 sm:px-0">
       {/* Avatar + stats */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6">
         <div className="flex items-center gap-5 mb-6">
@@ -120,7 +132,12 @@ export default function Profile() {
 
         <div>
           <label className="label">Bio</label>
-          <textarea {...register("bio")} rows={2} placeholder="A few words about your fitness journey..." className="input-field resize-none" />
+          <textarea 
+            {...register("bio")} 
+            rows={2} 
+            placeholder="A few words about your fitness journey..." 
+            className="input-field resize-none" 
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -144,11 +161,11 @@ export default function Profile() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="label">Weekly Workout Goal</label>
-            <input {...register("weeklyGoal")} type="number" min="1" max="7" className="input-field" />
+            <input {...register("weeklyGoal")} type="number" min="1" max="7" placeholder="4" className="input-field" />
           </div>
           <div>
-            <label className="label">Daily Water Goal (glasses)</label>
-            <input {...register("dailyWaterGoal")} type="number" min="1" max="30" className="input-field" />
+            <label className="label">Daily Hydration (L)</label>
+            <input {...register("dailyWaterGoal")} type="number" step="0.1" min="0.5" max="10" placeholder="2.5" className="input-field" />
           </div>
         </div>
 

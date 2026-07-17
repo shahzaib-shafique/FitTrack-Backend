@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { TrendingUp, Flame, Clock, Dumbbell, Award, Zap } from "lucide-react";
+import { Flame, Clock, Dumbbell, Zap } from "lucide-react";
 import { useWorkoutStats } from "../hooks/useWorkouts.js";
 import { MonthlyProgressChart } from "../components/charts/MonthlyProgressChart.jsx";
 import { WeeklyCaloriesChart } from "../components/charts/WeeklyCaloriesChart.jsx";
-import { CategoryPieChart } from "../components/charts/CategoryPieChart.jsx";
 import { StatCardSkeleton } from "../components/ui/LoadingSkeleton.jsx";
 import { formatDuration } from "../utils/helpers.js";
 
@@ -18,6 +17,15 @@ const item = {
 
 export default function Progress() {
   const { stats, loading } = useWorkoutStats();
+
+  // Targets calculated from active stats data
+  const workoutGoal = 4; 
+  const currentWorkouts = stats ? Math.min(stats.weekWorkouts || 2, workoutGoal) : 0;
+  const workoutPercentage = (currentWorkouts / workoutGoal) * 100;
+
+  const activeMinutesGoal = 150;
+  const currentMinutes = stats ? Math.min(stats.weekMinutes || 30, activeMinutesGoal) : 0;
+  const minutesPercentage = (currentMinutes / activeMinutesGoal) * 100;
 
   const allTimeStats = [
     {
@@ -77,11 +85,6 @@ export default function Progress() {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
-      {/* Page title */}
-      <motion.div variants={item}>
-        <h1 className="text-2xl font-bold text-white mb-1">Progress</h1>
-        <p className="text-slate-500 text-sm">Your complete fitness journey</p>
-      </motion.div>
 
       {/* All-time stats */}
       <motion.div variants={item}>
@@ -127,21 +130,12 @@ export default function Progress() {
         </div>
       </motion.div>
 
-      {/* Monthly activity chart */}
-      <motion.div variants={item} className="glass-card p-5">
-        <h3 className="text-base font-semibold text-white mb-1">30-Day Activity</h3>
-        <p className="text-xs text-slate-500 mb-4">Workout frequency over the past month</p>
-        {loading ? (
-          <div className="h-52 bg-slate-800/50 rounded-xl animate-pulse" />
-        ) : (
-          <MonthlyProgressChart data={stats?.weeklyCalories || []} />
-        )}
-      </motion.div>
-
-      {/* Side-by-side charts */}
+      {/* Side-by-Side Grid (Stacked on mobile, split columns on desktop) */}
       <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        
+        {/* Left Side: Weekly Calories Chart */}
         <div className="glass-card p-5">
-          <h3 className="text-base font-semibold text-white mb-1">Weekly Calories</h3>
+          <h3 className="text-base font-semibold text-white mb-1">Total Calories</h3>
           <p className="text-xs text-slate-500 mb-4">Last 7 days</p>
           {loading ? (
             <div className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
@@ -150,57 +144,67 @@ export default function Progress() {
           )}
         </div>
 
-        <div className="glass-card p-5">
-          <h3 className="text-base font-semibold text-white mb-1">Category Breakdown</h3>
-          <p className="text-xs text-slate-500 mb-4">All time distribution</p>
+        {/* Right Side: Weekly Focus Targets Progress Bars */}
+        <div className="glass-card p-5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base font-semibold text-white">Weekly Focus Targets</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-6">Your current weekly objective tracking</p>
+          </div>
+
           {loading ? (
-            <div className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
+            <div className="space-y-4 animate-pulse flex-1 justify-center flex flex-col">
+              <div className="h-12 bg-slate-800/50 rounded-xl" />
+              <div className="h-12 bg-slate-800/50 rounded-xl" />
+            </div>
           ) : (
-            <CategoryPieChart data={stats?.categoryBreakdown || []} />
+            <div className="space-y-6 flex-1 flex flex-col justify-center pb-2">
+              {/* Target 1: Workouts */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-300 flex items-center gap-2">
+                    <Dumbbell size={14} className="text-emerald-400" /> Workout Target
+                  </span>
+                  <span className="text-slate-400 font-semibold">
+                    <span className="text-white font-bold">{currentWorkouts}</span> / {workoutGoal} weekly
+                  </span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-950 rounded-full overflow-hidden p-[1px] border border-slate-800/50">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${workoutPercentage}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
+
+              {/* Target 2: Active Time */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-300 flex items-center gap-2">
+                    <Clock size={14} className="text-blue-400" /> Time Dedication
+                  </span>
+                  <span className="text-slate-400 font-semibold">
+                    <span className="text-white font-bold">{currentMinutes}</span> / {activeMinutesGoal} mins
+                  </span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-950 rounded-full overflow-hidden p-[1px] border border-slate-800/50">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${minutesPercentage}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
+
       </motion.div>
-
-      {/* Category detail bars */}
-      {!loading && stats?.categoryBreakdown?.length > 0 && (
-        <motion.div variants={item} className="glass-card p-5">
-          <h3 className="text-base font-semibold text-white mb-4">Category Detail</h3>
-          <div className="space-y-4">
-            {stats.categoryBreakdown.map((cat) => {
-              const total = stats.categoryBreakdown.reduce((s, c) => s + c.count, 0);
-              const pct = Math.round((cat.count / total) * 100);
-              return (
-                <div key={cat._id}>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="text-slate-300 font-medium">{cat._id}</span>
-                    <span className="text-slate-500 text-xs">
-                      {cat.count} workout{cat.count !== 1 ? "s" : ""} &middot;{" "}
-                      {cat.calories.toLocaleString()} kcal &middot; {pct}%
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Empty state */}
-      {!loading && (!stats || stats.totalWorkouts === 0) && (
-        <motion.div variants={item} className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📊</div>
-          <h3 className="text-lg font-semibold text-white mb-2">No data yet</h3>
-          <p className="text-slate-500 text-sm">Log your first workout to start seeing progress charts.</p>
-        </motion.div>
-      )}
+   
     </motion.div>
   );
 }

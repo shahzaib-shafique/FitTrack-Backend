@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Filter, SortAsc, Trash2, Edit3, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Filter, Trash2, Edit3, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { useWorkouts } from "../hooks/useWorkouts.js";
 import { useDebounce } from "../hooks/useDebounce.js";
@@ -57,23 +57,27 @@ export default function Workouts() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 px-1 sm:px-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Workout Log</h1>
-          <p className="text-slate-500 text-sm">{total} total workouts</p>
+      <div className="flex items-center justify-between mb-2 mt-1">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold text-white sm:text-slate-300 sm:font-semibold">Recorded Sessions</span>
+            <span className="bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-medium px-2 py-0.5 rounded-full">
+              {total} total
+            </span>
+          </div>
         </div>
-        <Link to="/workouts/new" className="btn-primary flex items-center gap-2 text-sm py-2.5 px-4">
+
+        <Link to="/workouts/new" className="btn-primary flex items-center gap-1.5 text-xs sm:text-sm py-2 px-3 sm:py-2.5 sm:px-4">
           <Plus size={15} />
-          <span className="hidden sm:inline">Log Workout</span>
-          <span className="sm:hidden">Add</span>
+          <span>Log Workout</span>
         </Link>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="glass-card p-4 space-y-3">
-        <div className="flex gap-3">
+      <div className="glass-card p-3 sm:p-4 space-y-3">
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
@@ -83,26 +87,31 @@ export default function Workouts() {
               className="input-field pl-10 py-2.5 text-sm"
             />
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition-all duration-200 ${
-              showFilters || category !== "All" || difficulty !== "All"
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
-            }`}
-          >
-            <Filter size={14} />
-            <span className="hidden sm:inline">Filter</span>
-          </button>
-          <select
-            value={sort}
-            onChange={(e) => { setSort(e.target.value); setPage(1); }}
-            className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-emerald-500/50 cursor-pointer"
-          >
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+          
+          {/* Action Row container for mobile styling alignment */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                showFilters || category !== "All" || difficulty !== "All"
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                  : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Filter size={14} />
+              <span>Filter</span>
+            </button>
+            
+            <select
+              value={sort}
+              onChange={(e) => { setSort(e.target.value); setPage(1); }}
+              className="flex-1 sm:flex-initial bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-emerald-500/50 cursor-pointer text-center sm:text-left"
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <AnimatePresence>
@@ -113,15 +122,15 @@ export default function Workouts() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="pt-3 border-t border-slate-800 flex flex-wrap gap-3">
+              <div className="pt-3 border-t border-slate-800/80 space-y-3">
                 <div>
-                  <p className="text-xs text-slate-500 mb-2">Category</p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">Category</p>
+                  <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
                     {["All", ...WORKOUT_CATEGORIES].map((c) => (
                       <button
                         key={c}
                         onClick={() => { setCategory(c); setPage(1); }}
-                        className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 ${
+                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all duration-200 flex items-center gap-1 ${
                           category === c
                             ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                             : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
@@ -133,13 +142,13 @@ export default function Workouts() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 mb-2">Difficulty</p>
-                  <div className="flex gap-1.5">
+                  <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">Difficulty</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {["All", ...DIFFICULTY_LEVELS].map((d) => (
                       <button
                         key={d}
                         onClick={() => { setDifficulty(d); setPage(1); }}
-                        className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 ${
+                        className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 flex-1 sm:flex-none text-center ${
                           difficulty === d
                             ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                             : "bg-slate-800 border-slate-700 text-slate-400 hover:text-white"
@@ -159,7 +168,7 @@ export default function Workouts() {
       {/* Workout List */}
       {loading ? (
         <div className="space-y-3">
-          {[...Array(5)].map((_, i) => <WorkoutCardSkeleton key={i} />)}
+          {[...Array(4)].map((_, i) => <WorkoutCardSkeleton key={i} />)}
         </div>
       ) : workouts.length === 0 ? (
         <EmptyState
@@ -183,7 +192,7 @@ export default function Workouts() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.03 }}
               >
                 <WorkoutCard
                   workout={workout}
@@ -197,21 +206,21 @@ export default function Workouts() {
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-2">
+        <div className="flex items-center justify-center gap-4 pt-3">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white disabled:opacity-40 transition-all"
+            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white disabled:opacity-40 transition-all active:scale-95"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-sm text-slate-400">
+          <span className="text-xs font-medium text-slate-400">
             Page {page} of {pages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(pages, p + 1))}
             disabled={page === pages}
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white disabled:opacity-40 transition-all"
+            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white disabled:opacity-40 transition-all active:scale-95"
           >
             <ChevronRight size={16} />
           </button>
@@ -231,47 +240,67 @@ export default function Workouts() {
 }
 
 function WorkoutCard({ workout, onDelete }) {
+  const displayTimestamp = () => {
+    const relative = formatRelativeDate(workout.date);
+    if (workout.time) {
+      return `${relative} • ${workout.time}`;
+    }
+    return relative;
+  };
+
   return (
-    <motion.div whileHover={{ scale: 1.005 }} className="glass-card-hover p-4">
-      <div className="flex items-start gap-3">
-        <div className="w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center text-xl shrink-0">
-          {CATEGORY_ICONS[workout.category] || "🏋️"}
+    <motion.div whileHover={{ scale: 1.002 }} className="glass-card border border-slate-800/60 p-3 sm:p-4 hover:border-slate-700/60 transition-all duration-200">
+      <div className="flex items-start gap-2.5 sm:gap-3.5">
+        {/* Dynamic Category Avatar Badge */}
+        <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/40 flex items-center justify-center text-slate-300 shrink-0 shadow-inner text-base sm:text-lg">
+          {CATEGORY_ICONS[workout.category] || <Calendar size={16} />}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <div>
-              <h3 className="text-sm font-semibold text-white">{workout.exercise}</h3>
-              <p className="text-xs text-slate-500">{workout.category} · {formatRelativeDate(workout.date)}</p>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-bold text-white tracking-wide truncate">{workout.exercise}</h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                <span>{workout.category}</span>
+                <span className="hidden xs:inline w-1 h-1 rounded-full bg-slate-700" />
+                <span className="text-slate-400">{displayTimestamp()}</span>
+              </p>
             </div>
-            <span className={`text-xs px-2 py-0.5 rounded-full border shrink-0 ${DIFFICULTY_COLOR[workout.difficulty]}`}>
+            
+            <span className={`text-[9px] sm:text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border shrink-0 text-center ${DIFFICULTY_COLOR[workout.difficulty]}`}>
               {workout.difficulty}
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-            <Stat label="Duration" value={formatDuration(workout.duration)} />
-            {workout.caloriesBurned > 0 && <Stat label="Calories" value={`${workout.caloriesBurned} kcal`} />}
-            {workout.sets && <Stat label="Sets" value={workout.sets} />}
-            {workout.reps && <Stat label="Reps" value={workout.reps} />}
-            {workout.weight && <Stat label="Weight" value={`${workout.weight} kg`} />}
+          {/* Upgraded Flexible Grid Stat Badges/Chips */}
+          <div className="flex flex-wrap gap-1.5 mt-2.5">
+            <StatChip label="Duration" value={formatDuration(workout.duration)} />
+            {workout.caloriesBurned > 0 && <StatChip label="Calories" value={`${workout.caloriesBurned} kcal`} />}
+            {workout.sets && <StatChip label="Sets" value={workout.sets} />}
+            {workout.reps && <StatChip label="Reps" value={workout.reps} />}
+            {workout.weight && <StatChip label="Weight" value={`${workout.weight} kg`} />}
           </div>
 
+          {/* Dedicated Section for Notes */}
           {workout.notes && (
-            <p className="text-xs text-slate-500 mt-2 italic truncate">"{workout.notes}"</p>
+            <div className="mt-2.5 pt-2 border-t border-slate-800/60">
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Notes</span>
+              <p className="text-xs text-slate-400 italic font-normal leading-relaxed break-words">"{workout.notes}"</p>
+            </div>
           )}
         </div>
 
-        <div className="flex gap-1 shrink-0">
+        {/* Floating Side Action Modifiers */}
+        <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-1 shrink-0 self-start">
           <Link
             to={`/workouts/${workout._id}/edit`}
-            className="p-2 rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all"
           >
             <Edit3 size={14} />
           </Link>
           <button
             onClick={onDelete}
-            className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
           >
             <Trash2 size={14} />
           </button>
@@ -281,11 +310,11 @@ function WorkoutCard({ workout, onDelete }) {
   );
 }
 
-function Stat({ label, value }) {
+function StatChip({ label, value }) {
   return (
-    <div className="flex items-center gap-1">
-      <span className="text-xs text-slate-500">{label}:</span>
-      <span className="text-xs text-slate-300 font-medium">{value}</span>
+    <div className="flex items-center gap-1 bg-slate-800/40 border border-slate-700/30 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px]">
+      <span className="text-slate-500 font-medium">{label}:</span>
+      <span className="text-slate-200 font-semibold">{value}</span>
     </div>
   );
 }
