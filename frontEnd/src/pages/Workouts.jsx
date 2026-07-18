@@ -25,6 +25,33 @@ const SORT_OPTIONS = [
   { value: "-duration", label: "Longest" },
 ];
 
+// Predefined image mapping matching your exactly selected exercises with premium dark-aesthetic filters
+export const EXERCISE_IMAGES = {
+  "bench press": "https://images.stockcake.com/public/9/2/4/924ca5c8-b6bf-4682-8392-197d4f1d7aeb_large/powerful-bench-press-stockcake.jpg",
+  "squat": "https://thumbs.dreamstime.com/b/caucasian-muscular-body-builder-sport-man-practice-weight-training-squat-barbell-core-muscle-inside-gym-dark-326689123.jpg",
+  "deadlift": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=150&auto=format&fit=crop&q=80",
+  "pull up": "https://wallpaperbat.com/img/150023-workout-picture-download-free-image-stock-photo.jpg",
+  "push up": "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=150&auto=format&fit=crop&q=80",
+  "lat pulldown": "https://thumbs.dreamstime.com/b/man-doing-lat-pulldown-exercise-gym-person-muscular-physique-performing-lat-pulldown-exercise-gym-image-398552209.jpg",
+  "seated row": "https://plus.unsplash.com/premium_photo-1661596481527-83400e477159?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "shoulder press": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=150&auto=format&fit=crop&q=80",
+  "leg press": "https://images.unsplash.com/photo-1434608519344-49d77a699e1d?w=150&auto=format&fit=crop&q=80",
+  "leg extension": "https://images.unsplash.com/photo-1434682772747-f16d3ea162c3?q=80&w=1174&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "leg curl": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=150&auto=format&fit=crop&q=80",
+  "bicep curl": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=150&auto=format&fit=crop&q=80",
+  "tricep pushdown": "https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=150&auto=format&fit=crop&q=80",
+  "running": "https://images.unsplash.com/photo-1609377375724-8fadc82cd50e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "walking": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=150&auto=format&fit=crop&q=80",
+  "cycling": "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=150&auto=format&fit=crop&q=80",
+  "jump rope": "https://images.unsplash.com/photo-1548690312-e3b507d8c110?w=150&auto=format&fit=crop&q=80",
+  "plank": "https://i.pinimg.com/originals/c9/dd/3b/c9dd3bc26e74f2ecdbcd260e62615e87.png",
+  "burpees": "https://images.unsplash.com/photo-1625151936268-e1ffba534f20?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "mountain climbers": "https://images.unsplash.com/photo-1687360356441-1396b2c5d12f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "chest press":"https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  // Default fallback for custom exercises
+  "default": "https://images.unsplash.com/photo-1734630341082-0fec0e10126c?q=80&w=1197&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+};
+
 export default function Workouts() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
@@ -248,18 +275,28 @@ function WorkoutCard({ workout, onDelete }) {
     return relative;
   };
 
+  // Safe string sanitization to prevent key lookup mismatch issues
+  const exerciseKey = (workout.exercise || "").toLowerCase().trim();
+  const matchedImageUrl = EXERCISE_IMAGES[exerciseKey] || EXERCISE_IMAGES["default"];
+
   return (
     <motion.div whileHover={{ scale: 1.002 }} className="glass-card border border-slate-800/60 p-3 sm:p-4 hover:border-slate-700/60 transition-all duration-200">
       <div className="flex items-start gap-2.5 sm:gap-3.5">
-        {/* Dynamic Category Avatar Badge */}
-        <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/40 flex items-center justify-center text-slate-300 shrink-0 shadow-inner text-base sm:text-lg">
-          {CATEGORY_ICONS[workout.category] || <Calendar size={16} />}
+        
+        {/* Dynamic Image Wrapper Container */}
+        <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-center shrink-0 overflow-hidden relative shadow-inner">
+          <img 
+            src={matchedImageUrl} 
+            alt={workout.exercise} 
+            className="w-full h-full object-cover opacity-70 contrast-125 brightness-90 saturate-[85%] transition-opacity duration-200 hover:opacity-90"
+            loading="lazy"
+          />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-bold text-white tracking-wide truncate">{workout.exercise}</h3>
+              <h3 className="text-sm font-bold text-white tracking-wide truncate capitalize">{workout.exercise}</h3>
               <p className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                 <span>{workout.category}</span>
                 <span className="hidden xs:inline w-1 h-1 rounded-full bg-slate-700" />

@@ -6,6 +6,7 @@ import { useWorkoutStats, useWorkouts } from "../hooks/useWorkouts.js";
 import { StatCardSkeleton, WorkoutCardSkeleton } from "../components/ui/LoadingSkeleton.jsx";
 import { WeeklyCaloriesChart } from "../components/charts/WeeklyCaloriesChart.jsx";
 import { formatDuration, formatRelativeDate, CATEGORY_ICONS, DIFFICULTY_COLOR } from "../utils/helpers.js";
+import { EXERCISE_IMAGES } from "./Workouts.jsx";
 
 const container = {
   hidden: { opacity: 0 },
@@ -154,8 +155,6 @@ export default function Dashboard() {
             <WeeklyCaloriesChart data={stats?.weeklyCalories || []} />
           )}
         </div>
-
-        
       </motion.div>
 
       {/* Recent workouts */}
@@ -201,19 +200,31 @@ export default function Dashboard() {
 }
 
 function RecentWorkoutCard({ workout }) {
+  // Normalize string for exact key matching down below
+  const exerciseKey = (workout.exercise || "").toLowerCase().trim();
+  const matchedImageUrl = EXERCISE_IMAGES?.[exerciseKey] || EXERCISE_IMAGES?.["default"];
+
   return (
     <Link to={`/workouts/${workout._id}`}>
       <motion.div
         whileHover={{ scale: 1.01 }}
         className="glass-card-hover p-4 flex items-center gap-4"
       >
-        <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-lg shrink-0">
-          {CATEGORY_ICONS[workout.category] || "🏋️"}
+        {/* Swapped standard background for the custom dynamic cover image badge */}
+        <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-center shrink-0 overflow-hidden relative shadow-inner">
+          <img 
+            src={matchedImageUrl} 
+            alt={workout.exercise} 
+            className="w-full h-full object-cover opacity-70 contrast-125 brightness-90 saturate-[85%]"
+            loading="lazy"
+          />
         </div>
+        
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{workout.exercise}</p>
+          <p className="text-sm font-semibold text-white truncate capitalize">{workout.exercise}</p>
           <p className="text-xs text-slate-500">{formatRelativeDate(workout.date)}</p>
         </div>
+        
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-xs text-slate-400">{formatDuration(workout.duration)}</span>
           {workout.caloriesBurned > 0 && (

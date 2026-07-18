@@ -12,6 +12,7 @@ import { WORKOUT_CATEGORIES, DIFFICULTY_LEVELS, CATEGORY_ICONS } from "../utils/
 
 const PREDEFINED_EXERCISES = [
   { name: "Bench Press", category: "Strength" },
+  { name: "Chest Press", category: "Strength" },
   { name: "Squat", category: "Strength" },
   { name: "Deadlift", category: "Strength" },
   { name: "Pull Up", category: "Strength" },
@@ -316,7 +317,6 @@ export default function WorkoutForm() {
                       : "bg-slate-800/50 border-slate-700/60 text-slate-400 hover:text-slate-200"
                   }`}
                 >
-                  {CATEGORY_ICONS[c] || <span>🏋️</span>}
                   {c}
                 </button>
               );
