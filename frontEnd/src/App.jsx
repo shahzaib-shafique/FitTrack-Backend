@@ -9,6 +9,7 @@ import ProtectedRoute from "./layouts/ProtectedRoute.jsx";
 import GuestRoute from "./layouts/GuestRoute.jsx";
 
 // Pages
+import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -24,19 +25,22 @@ import NotFound from "./pages/NotFound.jsx";
 function AppRoutes() {
   return (
     <Routes>
-      {/* Guest routes */}
+      {/* Public Landing Route — Evaluates conditionally first */}
+      <Route path="/" element={<Landing />} />
+
+      {/* Guest routes — Logged-in users automatically bounce away from these */}
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
       {/* Protected routes */}
       <Route
-        element = {
+        element={
           <ProtectedRoute>
             <AppLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        {/* Redirects users explicitly trying to access layout paths without parameters */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/workouts/new" element={<WorkoutForm />} />

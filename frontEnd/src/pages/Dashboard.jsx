@@ -174,7 +174,6 @@ export default function Dashboard() {
             [...Array(3)].map((_, i) => <WorkoutCardSkeleton key={i} />)
           ) : workouts.length === 0 ? (
             <div className="glass-card p-8 text-center">
-              <div className="text-4xl mb-3">🏋️</div>
               <p className="text-slate-400 text-sm mb-4">No workouts yet. Let's start moving!</p>
               <Link to="/workouts/new" className="btn-primary inline-flex items-center gap-2 text-sm px-4 py-2">
                 <Plus size={14} />
