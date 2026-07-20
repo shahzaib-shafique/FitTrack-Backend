@@ -6,6 +6,7 @@ import HeroSection from "../components/landing/HeroSection.jsx";
 import FeaturesSection from "../components/landing/FeaturesSection.jsx";
 import CTASection from "../components/landing/CTASection.jsx";
 import LandingFooter from "../components/landing/LandingFooter.jsx";
+import AboutSection from "../components/landing/About.jsx";
 
 export default function Landing() {
   const { user, loading } = useAuth();
@@ -35,7 +36,7 @@ export default function Landing() {
       <LandingNavbar />
       <HeroSection />
       <FeaturesSection />
-      <CTASection />
+      <AboutSection/>
       <LandingFooter />
     </div>
   );

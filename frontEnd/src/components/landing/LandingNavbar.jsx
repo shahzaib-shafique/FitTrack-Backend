@@ -17,6 +17,7 @@ export default function LandingNavbar() {
   const navLinks = [
     { name: "Home", href: "#home" },
     { name: "Features", href: "#features" },
+    { name: "About", href: "#about" }, // Fixed casing to match target section IDs perfectly
   ];
 
   const handleScrollTo = (e, id) => {

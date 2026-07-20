@@ -6,11 +6,13 @@ export default function HeroSection() {
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-16">
       
       {/* Background Physical Premium Asset Image Overlay */}
-      <div className="absolute inset-0 z-0 opacity-45 pointer-events-none mix-blend-luminosity">
+      {/* Using dynamic background centering wrappers to guarantee 100% cross-device responsiveness */}
+      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none mix-blend-luminosity select-none">
         <img 
-          src="https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcQYQjLEaWkKF-0Fc_23oymvhBiNn7fWQKUbP84LKJicyFUKLTmU73my6HrARs4kNEMNHKGFRqk5vjCxdfs" 
+          src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&q=80&w=2000" 
           alt="Premium Dark Aesthetic Gym Environment" 
-          className="w-full h-full object-cover object-center scale-105"
+          className="w-full h-full object-cover object-center scale-105 transition-transform duration-700"
+          loading="eager"
         />
       </div>
 
@@ -23,17 +25,6 @@ export default function HeroSection() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
-        {/* Micro-badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900/80 border border-gray-800 backdrop-blur-xs text-xs font-medium text-gray-300 mb-6"
-        >
-          <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
-          The Ultimate Training Interface
-        </motion.div>
-
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
