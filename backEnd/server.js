@@ -38,7 +38,7 @@ app.use(
 );
 
 // Rate limiting — 100 requests per 15 minutes per IP
-/* const limiter = rateLimit({
+ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
@@ -58,7 +58,7 @@ const authLimiter = rateLimit({
     success: false,
     message: "Too many authentication attempts. Please try again in 15 minutes.",
   },
-}); */
+}); 
 
 // Body & cookie parsing
 app.use(express.json({ limit: "10kb" }));
@@ -66,7 +66,7 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth",authLimiter, authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/goals", goalRoutes);
