@@ -1,10 +1,11 @@
 import axios from "axios";
 
-// Dynamically fetch the API URL from Vite / CRA env variables, or fallback to live backend
+// Dynamically fetch the API URL, defaulting to "/api" so Vercel rewrites handle it seamlessly.
+// For local development, you can create a .env file with VITE_API_URL=http://localhost:8000/api
 const BASE_URL =
   import.meta.env?.VITE_API_URL ||
   process.env?.REACT_APP_API_URL ||
-  "https://fit-track-backend-six.vercel.app/api";
+  "/api";
 
 const api = axios.create({
   baseURL: BASE_URL,
