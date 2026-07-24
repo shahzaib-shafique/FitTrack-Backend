@@ -1,7 +1,13 @@
 import axios from "axios";
 
+// Dynamically fetch the API URL from Vite / CRA env variables, or fallback to live backend
+const BASE_URL =
+  import.meta.env?.VITE_API_URL ||
+  process.env?.REACT_APP_API_URL ||
+  "https://fit-track-backend-six.vercel.app/api";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: BASE_URL,
   withCredentials: true, // send httpOnly cookies with every request
   headers: { "Content-Type": "application/json" },
 });
