@@ -4,7 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit"; // <-- Ensure this is imported
+import rateLimit from "express-rate-limit";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -17,6 +17,9 @@ import AppError from "./utils/AppError.js";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Enable trust proxy for Vercel/Render serverless proxies (Required for rate-limit)
+app.set("trust proxy", 1);
+
 // Security headers
 app.use(
   helmet({
@@ -24,7 +27,7 @@ app.use(
   })
 );
 
-// CORS
+// CORS Config
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -46,7 +49,7 @@ const limiter = rateLimit({
   },
 });
 
-// Apply global limiter to all /api routes BEFORE your route declarations
+// Apply global limiter to all /api routes BEFORE route declarations
 app.use("/api", limiter);
 
 // Body & cookie parsing
@@ -54,7 +57,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// Routes (Notice: authLimiter is NO LONGER here, it is inside authRoutes.js)
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/users", userRoutes);
