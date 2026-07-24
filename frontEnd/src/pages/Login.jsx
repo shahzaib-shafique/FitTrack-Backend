@@ -122,7 +122,7 @@ export default function Login() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 self-start tracking-tight">Sign in</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mb-6 sm:mb-8 self-start">Welcome back — let's get moving.</p>
+          <p className="text-xs sm:text-sm text-slate-400 mb-6 sm:mb-8 self-start">Welcome back let's get moving.</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
             <div>

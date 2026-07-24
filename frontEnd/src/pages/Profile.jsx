@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { User, Save, Award, Flame, Dumbbell } from "lucide-react";
+import { User, Save, Award, Flame, Dumbbell, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext.jsx";
 import { userService } from "../services/userService.js";
@@ -21,7 +21,7 @@ const schema = z.object({
 });
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const { stats } = useWorkoutStats();
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm({
@@ -41,12 +41,12 @@ export default function Profile() {
     if (user) {
       reset({
         name: user.name || "",
-        bio: "", // Empty to show native placeholder style on load
-        weight: "", // Empty to show native placeholder style on load
-        height: "", // Empty to show native placeholder style on load
+        bio: "",
+        weight: "",
+        height: "",
         fitnessGoal: user.fitnessGoal || "stay_active",
-        weeklyGoal: "", // Empty to show native placeholder style on load
-        dailyWaterGoal: "", // Empty to show native placeholder style on load
+        weeklyGoal: "",
+        dailyWaterGoal: "",
       });
     }
   }, [user, reset]);
@@ -65,7 +65,6 @@ export default function Profile() {
       updateUser(res.user);
       toast.success("Profile updated!");
       
-      // Clear specific input values back to empty strings right after saving to bring back the placeholders
       reset({
         ...data,
         bio: "",
@@ -79,6 +78,16 @@ export default function Profile() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      if (logout) {
+        await logout();
+      }
+    } catch (err) {
+      toast.error("Failed to sign out");
+    }
+  };
+
   const profileStats = [
     { icon: Dumbbell, label: "Total Workouts", value: stats?.totalWorkouts ?? "—", color: "text-emerald-400" },
     { icon: Flame, label: "Calories Burned", value: stats ? stats.totalCalories.toLocaleString() : "—", color: "text-orange-400" },
@@ -86,7 +95,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto px-2 sm:px-0">
+    <div className="space-y-6 max-w-2xl mx-auto px-2 sm:px-0 pb-10">
       {/* Avatar + stats */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6">
         <div className="flex items-center gap-5 mb-6">
@@ -185,6 +194,19 @@ export default function Profile() {
           )}
         </motion.button>
       </motion.form>
+
+      {/* Sign Out Button */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={handleLogout}
+          type="button"
+          className="w-full py-3.5 px-4 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-500/5 cursor-pointer"
+        >
+          <LogOut size={18} />
+          Sign Out
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
