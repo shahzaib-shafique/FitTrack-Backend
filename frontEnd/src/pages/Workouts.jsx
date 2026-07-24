@@ -199,7 +199,7 @@ export default function Workouts() {
         </div>
       ) : workouts.length === 0 ? (
         <EmptyState
-          icon="🏋️"
+          
           title="No workouts found"
           message={search || category !== "All" ? "Try adjusting your filters." : "Log your first workout to get started."}
           action={

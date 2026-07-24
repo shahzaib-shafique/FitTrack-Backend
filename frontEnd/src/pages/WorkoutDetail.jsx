@@ -61,7 +61,7 @@ export default function WorkoutDetail() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-3xl">
-            {CATEGORY_ICONS[workout.category] || "🏋️"}
+            {CATEGORY_ICONS[workout.category]}
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">{workout.exercise}</h1>

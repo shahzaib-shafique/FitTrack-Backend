@@ -1,11 +1,10 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
+import rateLimit from "express-rate-limit"; // <-- Ensure this is imported
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -15,19 +14,17 @@ import goalRoutes from "./routes/goalRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import AppError from "./utils/AppError.js";
 
-
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Security headers
-// Replace app.use(helmet()); with this:
 app.use(
   helmet({
     crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   })
 );
 
-// CORS — allow the frontend origin with credentials
+// CORS
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -37,8 +34,8 @@ app.use(
   })
 );
 
-// Rate limiting — 100 requests per 15 minutes per IP
- const limiter = rateLimit({
+// GLOBAL Rate limiting — 100 requests per 15 minutes per IP
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
@@ -48,25 +45,17 @@ app.use(
     message: "Too many requests from this IP. Please try again in 15 minutes.",
   },
 });
-app.use("/api", limiter);
 
-// Stricter limiter for auth routes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  message: {
-    success: false,
-    message: "Too many authentication attempts. Please try again in 15 minutes.",
-  },
-}); 
+// Apply global limiter to all /api routes BEFORE your route declarations
+app.use("/api", limiter);
 
 // Body & cookie parsing
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// Routes
-app.use("/api/auth",authLimiter, authRoutes);
+// Routes (Notice: authLimiter is NO LONGER here, it is inside authRoutes.js)
+app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/goals", goalRoutes);
@@ -84,7 +73,7 @@ app.use((req, res, next) => {
 // Global error handler
 app.use(errorHandler);
 
-// Start server after DB connection
+// Start server
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`\n🚀 FitTrack API running on http://localhost:${PORT}`);

@@ -25,6 +25,8 @@ function AppRoutes() {
   return (
     <Routes>
 
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
       {/* Guest routes — Logged-in users automatically bounce away from these */}
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
