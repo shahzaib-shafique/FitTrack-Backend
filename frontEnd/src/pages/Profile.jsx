@@ -190,7 +190,7 @@ export default function Profile() {
             </div>
             <div>
               <label className="label">Height (cm)</label>
-              <input {...register("height")} type="number" placeholder="175" className="input-field" />
+              <input {...register("height")} type="number" step="0.1" placeholder="175" className="input-field" />
             </div>
           </div>
 
