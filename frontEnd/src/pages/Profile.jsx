@@ -132,9 +132,6 @@ export default function Profile() {
             </div>
           </div>
 
-          <span className="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
-          {currentGoalLabel}
-          </span>
         </div>
 
         {/* Bio snippet */}
