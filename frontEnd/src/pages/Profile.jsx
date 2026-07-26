@@ -106,8 +106,8 @@ export default function Profile() {
       {/* --- MASTER UNIFIED PROFILE CARD --- */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden shadow-2xl">
         
-        {/* 1. Decorative Top Banner */}
-        <div className="h-24 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-blue-500/20 relative" />
+        {/* 1. Decorative Top Banner 
+        <div className="h-24 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-blue-500/20 relative" />*/}
 
         <div className="px-6 pb-6 pt-0 relative -mt-10 space-y-6">
           
