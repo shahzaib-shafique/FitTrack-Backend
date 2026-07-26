@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react"; // Added useRef
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,6 +23,7 @@ const schema = z.object({
 export default function Profile() {
   const { user, updateUser, logout } = useAuth();
   const { stats } = useWorkoutStats();
+  const isInitialized = useRef(false); // Track initial form load
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm({
     resolver: zodResolver(schema),
@@ -37,8 +38,9 @@ export default function Profile() {
     },
   });
 
+  // Only populate form fields once when the user data first loads
   useEffect(() => {
-    if (user) {
+    if (user && !isInitialized.current) {
       reset({
         name: user.name || "",
         bio: user.bio || "",
@@ -48,10 +50,11 @@ export default function Profile() {
         weeklyGoal: user.weeklyGoal ?? "",
         dailyWaterGoal: user.dailyWaterGoal ?? "",
       });
+      isInitialized.current = true;
     }
   }, [user, reset]);
 
-const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
     const payload = {
       ...data,
       weight: data.weight === "" ? null : Number(data.weight),
@@ -64,15 +67,15 @@ const onSubmit = async (data) => {
       const res = await userService.updateProfile(payload);
       updateUser(res.user);
       
-      // Explicitly reset the form with the fresh server response to clear isDirty state
+      // Clear form inputs back to empty state to show placeholders
       reset({
-        name: res.user.name || "",
-        bio: res.user.bio || "",
-        weight: res.user.weight ?? "",
-        height: res.user.height ?? "",
-        fitnessGoal: res.user.fitnessGoal || "stay_active",
-        weeklyGoal: res.user.weeklyGoal ?? "",
-        dailyWaterGoal: res.user.dailyWaterGoal ?? "",
+        name: "",
+        bio: "",
+        weight: "",
+        height: "",
+        fitnessGoal: "stay_active",
+        weeklyGoal: "",
+        dailyWaterGoal: "",
       });
 
       toast.success("Profile updated!");
@@ -97,8 +100,6 @@ const onSubmit = async (data) => {
     { icon: Award, label: "Current Streak", value: stats ? `${stats.streak}d` : "—", color: "text-cyan-400" },
   ];
 
-  const currentGoalLabel = FITNESS_GOALS.find((g) => g.value === user?.fitnessGoal)?.label || "Stay Active";
-
   // Calculate BMI dynamically from weight and height
   const calculateBMI = (w, h) => {
     if (!w || !h) return null;
@@ -107,7 +108,6 @@ const onSubmit = async (data) => {
   };
   const currentBMI = user?.bmi || calculateBMI(user?.weight, user?.height);
 
-  // Array of quick metrics to guarantee all 5 render cleanly
   const metricsList = [
     { label: "Weight", value: user?.weight ? `${user.weight} kg` : "—" },
     { label: "Height", value: user?.height ? `${user.height} cm` : "—" },
@@ -119,10 +119,9 @@ const onSubmit = async (data) => {
   return (
     <div className="max-w-2xl mx-auto px-2 sm:px-0 pb-12">
       
-      {/* --- MASTER UNIFIED PROFILE CARD (Fixed padding so avatar doesn't clip) --- */}
+      {/* --- MASTER UNIFIED PROFILE CARD --- */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 pt-8 shadow-2xl space-y-6">
         
-        {/* Top row: Avatar, Name, Email, and Goal Badge */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-xl shadow-emerald-500/20 shrink-0">
@@ -133,17 +132,14 @@ const onSubmit = async (data) => {
               <p className="text-slate-400 text-xs sm:text-sm truncate">{user?.email}</p>
             </div>
           </div>
-
         </div>
 
-        {/* Bio snippet */}
         {user?.bio && (
           <p className="text-slate-300 text-xs sm:text-sm bg-slate-800/40 p-3 rounded-xl border border-slate-700/40 italic">
             "{user.bio}"
           </p>
         )}
 
-        {/* Quick Metrics Grid (Weight, Height, BMI, Weekly Goal, Hydration) */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center">
           {metricsList.map((m, idx) => (
             <div 
@@ -158,8 +154,6 @@ const onSubmit = async (data) => {
           ))}
         </div>
 
-
-        {/* Divider */}
         <hr className="border-slate-700/50 my-2" />
 
         {/* --- EDIT PROFILE FORM --- */}
