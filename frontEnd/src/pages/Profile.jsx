@@ -62,7 +62,19 @@ const onSubmit = async (data) => {
     };
     try {
       const res = await userService.updateProfile(payload);
-      updateUser(res.user); // Updates the top card and triggers useEffect to reset the form automatically
+      updateUser(res.user);
+      
+      // Explicitly reset the form with the fresh server response to clear isDirty state
+      reset({
+        name: res.user.name || "",
+        bio: res.user.bio || "",
+        weight: res.user.weight ?? "",
+        height: res.user.height ?? "",
+        fitnessGoal: res.user.fitnessGoal || "stay_active",
+        weeklyGoal: res.user.weeklyGoal ?? "",
+        dailyWaterGoal: res.user.dailyWaterGoal ?? "",
+      });
+
       toast.success("Profile updated!");
     } catch (err) {
       toast.error(err.message);
