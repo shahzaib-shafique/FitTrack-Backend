@@ -51,7 +51,7 @@ export default function Profile() {
     }
   }, [user, reset]);
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
     const payload = {
       ...data,
       weight: data.weight === "" ? null : Number(data.weight),
@@ -62,18 +62,8 @@ export default function Profile() {
     };
     try {
       const res = await userService.updateProfile(payload);
-      updateUser(res.user);
+      updateUser(res.user); // Updates the top card and triggers useEffect to reset the form automatically
       toast.success("Profile updated!");
-      
-      reset({
-        name: res.user.name || "",
-        bio: res.user.bio || "",
-        weight: res.user.weight ?? "",
-        height: res.user.height ?? "",
-        fitnessGoal: res.user.fitnessGoal || "stay_active",
-        weeklyGoal: res.user.weeklyGoal ?? "",
-        dailyWaterGoal: res.user.dailyWaterGoal ?? "",
-      });
     } catch (err) {
       toast.error(err.message);
     }
