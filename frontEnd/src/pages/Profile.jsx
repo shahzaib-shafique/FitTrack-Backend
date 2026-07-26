@@ -156,16 +156,6 @@ export default function Profile() {
           ))}
         </div>
 
-        {/* Core Workout Performance Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {profileStats.map((s) => (
-            <div key={s.label} className="bg-slate-800/60 rounded-xl p-3 text-center border border-slate-700/50 shadow-inner">
-              <s.icon size={16} className={`${s.color} mx-auto mb-1`} />
-              <p className="text-base sm:text-lg font-bold text-white">{s.value}</p>
-              <p className="text-[10px] sm:text-xs text-slate-400">{s.label}</p>
-            </div>
-          ))}
-        </div>
 
         {/* Divider */}
         <hr className="border-slate-700/50 my-2" />
