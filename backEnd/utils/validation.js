@@ -104,17 +104,20 @@ export const profileUpdateSchema = z.object({
 
   bio: z.string().max(300).optional().nullable(),
 
-  weight: z.number().min(20).max(500).optional().nullable(),
+  // Changed to coerce.number() to handle string/number inputs
+  weight: z.coerce.number().min(20).max(500).optional().nullable(),
 
-  height: z.number().min(50).max(300).optional().nullable(),
+  // Changed to coerce.number() to allow floating-point values (decimals like 172.2)
+  height: z.coerce.number().min(50).max(300).optional().nullable(),
 
   fitnessGoal: z
     .enum(["lose_weight", "build_muscle", "improve_endurance", "stay_active", "other"])
     .optional(),
 
-  weeklyGoal: z.number().int().min(1).max(7).optional(),
+  weeklyGoal: z.coerce.number().int().min(1).max(7).optional(),
 
-  dailyWaterGoal: z.number().int().min(1).max(30).optional(),
+  // Removed .int() and changed to coerce.number() to allow decimal water amounts (e.g., 2.5L)
+  dailyWaterGoal: z.coerce.number().min(0.5).max(30).optional(),
 });
 
 /**
