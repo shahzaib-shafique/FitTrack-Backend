@@ -55,7 +55,7 @@ export default function Profile() {
     const payload = {
       ...data,
       weight: data.weight === "" ? null : Number(data.weight),
-      height: data.height === "" ? null : Number(data.height),
+      height: data.height === "" ? null : parseFloat(data.height),
       weeklyGoal: data.weeklyGoal === "" ? null : Number(data.weeklyGoal),
       dailyWaterGoal: data.dailyWaterGoal === "" ? null : Number(data.dailyWaterGoal),
       bio: data.bio === "" ? null : data.bio,
