@@ -97,7 +97,7 @@ export default function Profile() {
 
   const currentGoalLabel = FITNESS_GOALS.find((g) => g.value === user?.fitnessGoal)?.label || "Stay Active";
 
-  // Calculate BMI dynamically from weight and height if available
+  // Calculate BMI dynamically from weight and height
   const calculateBMI = (w, h) => {
     if (!w || !h) return null;
     const heightInMeters = h / 100;
@@ -105,11 +105,20 @@ export default function Profile() {
   };
   const currentBMI = user?.bmi || calculateBMI(user?.weight, user?.height);
 
+  // Array of quick metrics to guarantee all 5 render cleanly
+  const metricsList = [
+    { label: "Weight", value: user?.weight ? `${user.weight} kg` : "—" },
+    { label: "Height", value: user?.height ? `${user.height} cm` : "—" },
+    { label: "BMI", value: currentBMI ? currentBMI : "—", isEmerald: true },
+    { label: "Weekly Goal", value: user?.weeklyGoal ? `${user.weeklyGoal} days` : "—" },
+    { label: "Hydration", value: user?.dailyWaterGoal ? `${user.dailyWaterGoal} L` : "—" },
+  ];
+
   return (
     <div className="max-w-2xl mx-auto px-2 sm:px-0 pb-12">
       
-      {/* --- MASTER UNIFIED PROFILE CARD (No top color banner) --- */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 shadow-2xl space-y-6">
+      {/* --- MASTER UNIFIED PROFILE CARD (Fixed padding so avatar doesn't clip) --- */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 pt-8 shadow-2xl space-y-6">
         
         {/* Top row: Avatar, Name, Email, and Goal Badge */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -137,26 +146,17 @@ export default function Profile() {
 
         {/* Quick Metrics Grid (Weight, Height, BMI, Weekly Goal, Hydration) */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center">
-          <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40">
-            <p className="text-[11px] text-slate-400">Weight</p>
-            <p className="text-sm font-semibold text-white">{user?.weight ? `${user.weight} kg` : "—"}</p>
-          </div>
-          <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40">
-            <p className="text-[11px] text-slate-400">Height</p>
-            <p className="text-sm font-semibold text-white">{user?.height ? `${user.height} cm` : "—"}</p>
-          </div>
-          <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40 col-span-2 sm:col-span-1">
-            <p className="text-[11px] text-slate-400">BMI</p>
-            <p className="text-sm font-semibold text-emerald-400">{currentBMI ? currentBMI : "—"}</p>
-          </div>
-          <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40">
-            <p className="text-[11px] text-slate-400">Weekly Goal</p>
-            <p className="text-sm font-semibold text-white">{user?.weeklyGoal ? `${user.weeklyGoal} days` : "—"}</p>
-          </div>
-          <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40">
-            <p className="text-[11px] text-slate-400">Hydration</p>
-            <p className="text-sm font-semibold text-white">{user?.dailyWaterGoal ? `${user.dailyWaterGoal} L` : "—"}</p>
-          </div>
+          {metricsList.map((m, idx) => (
+            <div 
+              key={m.label} 
+              className={`bg-slate-800/40 p-2.5 rounded-xl border border-slate-700/40 ${idx === 2 ? "col-span-2 sm:col-span-1" : ""}`}
+            >
+              <p className="text-[11px] text-slate-400">{m.label}</p>
+              <p className={`text-sm font-semibold ${m.isEmerald ? "text-emerald-400" : "text-white"}`}>
+                {m.value}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Core Workout Performance Stats */}
@@ -235,7 +235,7 @@ export default function Profile() {
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <Save size=15 />
+                <Save size={15} />
                 Save Changes
               </>
             )}
